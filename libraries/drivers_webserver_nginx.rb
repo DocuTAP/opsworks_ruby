@@ -13,8 +13,14 @@ module Drivers
       notifies :deploy, action: :reload, resource: 'service[nginx]', timer: :delayed
       notifies :undeploy, action: :reload, resource: 'service[nginx]', timer: :delayed
       log_paths lambda { |context|
-        %w[access.log error.log].map do |log_type|
-          File.join(context.raw_out[:log_dir], "#{context.app[:domains].first}.#{log_type}")
+        if context.app[:enable_ssl]
+          %w[-ssl.access.log -ssl.error.log .access.log .error.log].map do |log_type|
+            File.join(context.raw_out[:log_dir], "#{context.app[:domains].first}#{log_type}")
+          end
+        else
+          %w[.access.log .error.log].map do |log_type|
+            File.join(context.raw_out[:log_dir], "#{context.app[:domains].first}#{log_type}")
+          end
         end
       }
 
