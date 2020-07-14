@@ -48,7 +48,12 @@ end
 if node['platform_family'] == 'debian'
   node.default['ruby-ng']['ruby_version'] = node['ruby-version']
   include_recipe 'ruby-ng::dev'
+elsif node['platform'] == 'amazon' && node['platform_version'] == '2'
+  # Amazon Linux 2
+  ruby_pkg_version = node['ruby-version'].split('.')[0..1]
+  execute "amazon-linux-extras install ruby#{ruby_pkg_version.join('.')}"
 else
+  # Amazon Linux 20XX.XX
   ruby_pkg_version = node['ruby-version'].split('.')[0..1]
   package "ruby#{ruby_pkg_version.join('')}"
   package "ruby#{ruby_pkg_version.join('')}-devel"
